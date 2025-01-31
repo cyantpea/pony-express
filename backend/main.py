@@ -7,8 +7,11 @@ Args:
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from pydantic import BaseModel
+from sqlmodel import Session
 
 from backend.dependencies import create_db_tables
+from backend.database.schema import DBAccount, DBChat, DBChatMembership, DBMessage
 
 
 @asynccontextmanager
@@ -18,12 +21,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="<your API title>",
-    summary="<your API summary>",
+    title="Pony Express",
+    summary="a messaging application",
     lifespan=lifespan,
 )
 
 
+# ========== router ==========
 @app.get("/status", response_model=None, status_code=204)
 def status():
     pass

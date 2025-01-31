@@ -2,7 +2,7 @@
 name = "pony-express"
 version = "0.1.0"
 description = "Web API for PonyExpress messaging application"
-authors = ["your name <your_email@example.com>"]
+authors = ["Cynthea Peang <u1282725@utah.edu>"]
 readme = "README.md"
 package-mode = false
 
@@ -23,6 +23,7 @@ mangum = "^0.19.0"
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.31.0"
 pytest = "^8.3.4"
+httpx = "^0.28.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
