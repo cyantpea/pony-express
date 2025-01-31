@@ -8,10 +8,17 @@ from backend.database import accounts as db_accounts
 accounts_router = APIRouter(prefix="/accounts", tags=["Accounts"])
 
 @accounts_router.get("/")
-def accounts(session: DBSession):
-    return db_accounts.get_all(session)
+def get_accounts(session: DBSession):
+    accounts = db_accounts.get_all(session)
 
-@accounts_router.get("/{account_id}", response_model=Account)
+    response = {
+        "metadata": {"count": len(accounts)},
+        "accounts":  [{"id": account.id, "username": account.username} for account in accounts]
+    }
+    
+    return response
+
+@accounts_router.get("/{account_id}")
 def get_account(session: DBSession, account_id: int):
-    return db_accounts.get_by_id(session, account_id)
-
+    account = db_accounts.get_by_id(session, account_id)
+    return {"id": account.id, "username": account.username}
