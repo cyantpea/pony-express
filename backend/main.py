@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from backend.dependencies import create_db_tables
 from backend.routers.accounts import accounts_router
 from backend.routers.chats import chats_router
+from backend.routers.auth import auth_router
 from backend.exceptions import EntityNotFound
 
 
@@ -26,7 +27,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-for router in [accounts_router, chats_router]:
+for router in [accounts_router, chats_router, auth_router]:
     app.include_router(router)
 
 # ========== router ==========

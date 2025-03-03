@@ -20,3 +20,26 @@ class EntityNotFound(HTTPException):
             status_code=self.status_code,
             content=self.content.model_dump()
         )
+
+class Forbidden(HTTPException):
+    def __init__(self, error: str, message: str):
+        self.error = error
+        self.message = message
+        self.status_code = 403
+    
+    def response(self) -> Response:
+        return JSONResponse(
+            status_code=self.status_code,
+            error=self.error,
+            message=self.message
+        )
+
+
+def authentication_required():
+    return Forbidden("authentication_required", "Not authenticated")
+
+def expired_access_token():
+    return Forbidden("expired_access_token", "Authentication failed: expired access token")
+
+def invalid_access_token():
+    return Forbidden("invalid_access_token", "Authentication failed: invalid access token")

@@ -4,6 +4,19 @@ from datetime import datetime
 
 from sqlmodel import Field, SQLModel
 
+class DBRegistration(SQLModel, table=True):
+    __tablename__ = "registrations"
+    
+    id: int | None = Field(default=None, primary_key=True)
+    account_id: int = Field(foreign_key="accounts.id")
+
+class DBToken(SQLModel, table=True):
+    __tablename__ = "tokens"
+    
+    id: int | None = Field(default=None, primary_key=True)
+    account_id: int = Field(foreign_key="accounts.id")
+    token: str  
+    created_at: datetime = Field(default_factory=datetime.now)
 
 class DBAccount(SQLModel, table=True):
     __tablename__ = "accounts"  # type: ignore
