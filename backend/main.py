@@ -6,11 +6,12 @@ Args:
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 from backend.dependencies import create_db_tables
 from backend.routers.accounts import accounts_router
 from backend.routers.chats import chats_router
+from backend.exceptions import EntityNotFound
 
 
 @asynccontextmanager
@@ -32,3 +33,7 @@ for router in [accounts_router, chats_router]:
 @app.get("/status", response_model=None, status_code=204)
 def status():
     pass
+
+@app.exception_handler(EntityNotFound)
+def handle_not_found(request: Request, exception: EntityNotFound):
+    return exception.response()

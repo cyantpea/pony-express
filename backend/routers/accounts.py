@@ -21,4 +21,8 @@ def get_accounts(session: DBSession):
 @accounts_router.get("/{account_id}")
 def get_account(session: DBSession, account_id: int):
     account = db_accounts.get_by_id(session, account_id)
-    return {"id": account.id, "username": account.username}
+    if account is not None:
+        return {"id": account.id, "username": account.username}
+    
+    print("hello")
+    return EntityNotFound("account", account_id)
