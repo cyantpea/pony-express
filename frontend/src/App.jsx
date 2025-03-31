@@ -43,7 +43,7 @@ function Nav() {
     isActive ? "text-orange-600" : "text-blue-500 hover:text-blue-200"
 
   return (
-    <nav className="min-w-full bg-gray-700">
+    <nav className="min-w-full min-h-full bg-gray-700">
       <ul>
         <li className="text-gray-400 text-2xl text-bold text-center list-none">
           Pony Express
@@ -96,7 +96,7 @@ function Message({ text, account_id,  created_at }) {
 
   return (
     <li className="p-2 bg-gray-200 m-2 rounded-sm">
-      <div className="flex justify-between">
+      <div className="flex justify-between text-gray-400">
         <span>{username}</span> 
         <span>{date.toLocaleString()}</span>
       </div>

@@ -28,6 +28,9 @@ export const useChatMessages = (chatId) => {
 }
 
 export const useUsername = (accountId) => {
+    if (accountId == null) 
+        return { username: "[removed]", error: null };
+
     const { data, error } = useQuery({
         queryKey: ["username"],
         queryFn: () => api.get("/accounts/" + accountId),
