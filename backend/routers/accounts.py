@@ -24,5 +24,4 @@ def get_account(session: DBSession, account_id: int):
     if account is not None:
         return {"id": account.id, "username": account.username}
     
-    print("hello")
     return EntityNotFound("account", account_id)

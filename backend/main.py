@@ -7,6 +7,7 @@ Args:
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.dependencies import create_db_tables
 from backend.routers.accounts import accounts_router
@@ -25,6 +26,14 @@ app = FastAPI(
     title="Pony Express",
     summary="a messaging application",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True,
 )
 
 for router in [accounts_router, chats_router, auth_router]:
