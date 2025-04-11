@@ -1,9 +1,9 @@
-from fastapi import APIRouter
-from sqlmodel import Session
+from fastapi import APIRouter, Depends
 
-from backend.dependencies import DBSession
-from backend.models.accounts import Account
+from backend.dependencies import CurrentAccount, DBSession, get_current_account
+from backend.exceptions import EntityNotFound
 from backend.database import accounts as db_accounts
+from backend.models.accounts import AccountUpdate
 
 accounts_router = APIRouter(prefix="/accounts", tags=["Accounts"])
 
@@ -25,3 +25,31 @@ def get_account(session: DBSession, account_id: int):
         return {"id": account.id, "username": account.username}
     
     return EntityNotFound("account", account_id)
+
+@accounts_router.get("/me", status_code=200)
+def get_self(account: CurrentAccount):
+    
+    return {
+        "id": account.id,
+        "username": account.username,
+        "email": account.email
+    }
+    
+
+@accounts_router.put("/me", status_code=200)
+def update_self(session: DBSession, updated_account: AccountUpdate, account: CurrentAccount):
+    db_accounts.update_account(session, account.id, updated_account)
+    return {
+        "id": account.id,
+        "username": updated_account.username,
+        "email": updated_account.email
+    }   
+    
+
+@accounts_router.put("/me/password")
+def reset_password():
+    return
+
+@accounts_router.delete("/me")
+def delete_me():
+    return

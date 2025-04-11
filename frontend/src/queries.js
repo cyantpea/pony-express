@@ -40,3 +40,23 @@ export const useUsername = (accountId) => {
     const username = data?.username || "[removed]";
     return { username, error };
 }
+
+export const useAccount = () => {
+    const { headers, loggedIn, logout } = useContext(AuthContext);
+    const query = useQuery({
+        enabled: loggedIn,
+        queryKey: ["account"],
+        queryFn: async () => {
+            const response = await fetch("/accounts/me", { headers });
+            const data = await response.json();
+            if (response.ok) {
+                return data;
+            }
+            if (data.error === "expired_access_token") {
+                logout();
+            }
+            throw new ApiError(response.status, data);
+        }
+    });
+    return query.data || { id: -1, username: "", email: "" };
+}

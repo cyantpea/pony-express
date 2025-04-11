@@ -13,7 +13,7 @@ from backend.dependencies import create_db_tables
 from backend.routers.accounts import accounts_router
 from backend.routers.chats import chats_router
 from backend.routers.auth import auth_router
-from backend.exceptions import EntityNotFound
+from backend.exceptions import CustomHTTPException
 
 
 @asynccontextmanager
@@ -44,6 +44,7 @@ for router in [accounts_router, chats_router, auth_router]:
 def status():
     pass
 
-@app.exception_handler(EntityNotFound)
-def handle_not_found(request: Request, exception: EntityNotFound):
+# ========== exception handlers ==========
+@app.exception_handler(CustomHTTPException)
+def handle_exceptions(request: Request, exception: CustomHTTPException):
     return exception.response()
