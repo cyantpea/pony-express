@@ -13,11 +13,11 @@ from backend.database.schema import DBAccount
 
 
 load_dotenv()
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-JWT_COOKIE_KEY = os.getenv("JWT_COOKIE_KEY")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
-JWT_ISSUER = os.getenv("JWT_ISSUER")
-DURATION = 60 * 60 * 24 * 7  
+JWT_SECRET_KEY = os.getenv("jwt_secret_key")
+JWT_COOKIE_KEY = os.getenv("jwt_cookie_key")
+JWT_ALGORITHM = os.getenv("jwt_algorithm")
+JWT_ISSUER = os.getenv("jwt_issuer")
+DURATION = os.getenv("jwt_duration", 3600)  # Default to 1 hour if not set
 
 
 def create_user(session: Session, form: Registration) -> DBAccount:
