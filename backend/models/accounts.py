@@ -17,3 +17,9 @@ class AccountUpdate(BaseModel):
 
     username: Optional[str] = None
     email: Optional[str] = None
+
+class UpdatePassword(BaseModel):
+    """Request model for updating an account's password."""
+
+    old_password: str
+    new_password: str

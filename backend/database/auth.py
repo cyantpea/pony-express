@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from sqlmodel import Session, select
 
 from backend.models.auth import AccessToken, Claims, Login, Registration
-from backend.exceptions import DuplicateEntityValue, EntityNotFound, InvalidCredentials
+from backend.exceptions import DuplicateEntityValue, EntityNotFound, Forbidden, InvalidCredentials
 from backend.utils import _hash_password, _verify_password  
 from backend.database.schema import DBAccount
 
@@ -109,12 +109,20 @@ def extract_account(session: Session, token: str) -> DBAccount:
         DBAccount: The account tied to the token
 
     Raises:
-        ExpiredAccessToken: if the token is expired
-        InvalidAccessToken: if the token decodes improperly or the account does not exist
+        Forbidden: if the token is expired or invalid
+        InvalidCredentials: if the account does not exist
     """
 
-    claims = generate_claims(token)
-    account_id = int(claims.sub)
+
+    if not token:
+        raise Forbidden("authentication_required", "Not authenticated")
+    try:
+        claims = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        raise Forbidden("expired_access_token", "Authentication failed: expired access token")
+    except jwt.InvalidTokenError:
+        raise Forbidden("invalid_access_token", "Authentication failed: invalid access token")
+    account_id = int(claims['sub'])  
     account = session.get(DBAccount, account_id)
     if account is None:
         raise InvalidCredentials()

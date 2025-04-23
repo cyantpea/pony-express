@@ -23,10 +23,17 @@ function NotFound() {
 
 function Home() {
   const { loggedIn } = useContext(AuthContext);
-  
-  if (loggedIn)
-    return <Navigate to="/chats" />;
+  const [redirect, setRedirect] = useState(false);
 
+  useEffect(() => {
+    if (loggedIn) {
+      setRedirect(true);
+    }
+  }, [loggedIn]);
+
+  if (redirect) {
+    return <Navigate to="/chats" replace />;
+  }
 
   return (
     <div>
@@ -149,10 +156,11 @@ function Nav() {
 
 function Button() {
     const getClassName = "hover:bg-blue-200 rounded px-2 py-1 hover:text-gray-700 text-gray-200 bg-blue-700";
-
+    const { logout } = useContext(AuthContext);
+    
     return (
         <Link to="/">
-            <button type="button" className={getClassName}>Logout</button>
+            <button onClick={logout} type="button" className={getClassName}>Logout</button>
         </Link>
     );
 }

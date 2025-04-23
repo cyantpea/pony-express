@@ -1,7 +1,7 @@
 """Dependencies for the backend API.
 
 Args:
-    engine (sqlachemy.engine.Engine): The database engine
+    engine (sqlalchemy.engine.Engine): The database engine
 """
 from typing import Annotated
 
@@ -11,7 +11,7 @@ from sqlmodel import SQLModel, create_engine, Session, text
 
 from backend.database.schema import *
 from backend.database import auth as db_auth
-from backend.exceptions import InvalidCredentials
+from backend.exceptions import Forbidden, InvalidCredentials
 from backend.config import settings
 
 _db_filename = "backend/database/development.db"
@@ -45,7 +45,7 @@ def get_token(
         return cookie_token
     if bearer is not None:
         return bearer.credentials
-    raise InvalidCredentials()
+    raise Forbidden("authentication_required", "Not authenticated")
 
 def get_current_account(
     session: Session = Depends(get_session),
