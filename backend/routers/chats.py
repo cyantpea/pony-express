@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response
 
-from backend.dependencies import  DBSession
+from backend.dependencies import  CurrentAccount, DBSession
 from backend.database import chats as db_chats
 from backend.models import chats as model_chats
 
@@ -17,8 +17,8 @@ def get_chats(session: DBSession):
     return response
 
 @chats_router.post("/", status_code=201)
-def put_chats(session: DBSession, chat: model_chats.ChatCreate):
-    new_chat = db_chats.create_chat(session, chat)
+def put_chats(session: DBSession, chat: model_chats.ChatCreate, account: CurrentAccount):
+    new_chat = db_chats.create_chat(session, chat, account.id)
 
     return {
         "id": new_chat.id,
@@ -68,8 +68,8 @@ def get_chat_messages(session: DBSession, chat_id: int):
     return response
 
 @chats_router.post("/{chat_id}/messages", status_code=201)
-def post_chat_messages(session: DBSession, chat_id: int, message: model_chats.MessageCreate):
-    new_message = db_chats.add_message(session, chat_id, message)
+def post_chat_messages(session: DBSession, chat_id: int, message: model_chats.MessageCreate, account: CurrentAccount):
+    new_message = db_chats.add_message(session, chat_id, message, account.id)
 
     return {
         "id": new_message.id,

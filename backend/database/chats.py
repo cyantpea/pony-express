@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
 from backend.database.schema import DBChat, DBMessage, DBAccount, DBChatMembership
-from backend.exceptions import ChatMembershipRequired, ChatOwnerRemoval, EntityNotFound, DuplicateEntity
+from backend.exceptions import ChatMembershipRequired, ChatOwnerRemoval, EntityNotFound, DuplicateEntity, Forbidden
 from backend.models.chats import ChatCreate, ChatUpdate, ChatMembershipCreate, ChatMembership, MessageCreate, MessageUpdate
 from backend.database import accounts as db_accounts
 
@@ -91,7 +91,7 @@ def get_messages_for_chat(session: Session, chat_id: int) -> list[DBMessage]:
     results = session.exec(stmt)
     return list(results)
 
-def create_chat(session: Session, chat: ChatCreate) -> DBChat:
+def create_chat(session: Session, chat: ChatCreate, account_id: int) -> DBChat:
     """Create a new chat in the database.
     
     Args:
@@ -106,6 +106,9 @@ def create_chat(session: Session, chat: ChatCreate) -> DBChat:
         DuplicateEntity: If the chat name already exists
     """
 
+    if chat.owner_id != account_id:
+        raise Forbidden("access_denied", "Cannot create chat on behalf of different account")
+    
     user = db_accounts.get_by_id(session, chat.owner_id)
 
     duplicate_chat = get_by_name(session, chat.name)
@@ -158,7 +161,7 @@ def update_chat(session: Session, chat_id: int, chat: ChatUpdate) -> DBChat:
 
     if (chat.name):
         duplicate_chat = get_by_name(session, chat.name)
-        if (duplicate_chat):
+        if (duplicate_chat and duplicate_chat.id != chat_id):
             raise DuplicateEntity(chat.name)
         setattr(updated_chat, "name", chat.name)
     
@@ -191,7 +194,7 @@ def delete_chat(session: Session, chat_id: int):
 
     session.commit()
     
-def add_message(session: Session, chat_id: int, message: MessageCreate) -> DBMessage:
+def add_message(session: Session, chat_id: int, message: MessageCreate, account_id: int) -> DBMessage:
     """Add a message to a chat.
     
     Args:
@@ -206,7 +209,8 @@ def add_message(session: Session, chat_id: int, message: MessageCreate) -> DBMes
         EntityNotFound: If no chat with given id exists
         ChatMembershipRequired: If the account is not a member of the chat or does not exist
     """
-    
+    if message.account_id != account_id:
+        raise Forbidden("access_denied", "Cannot create message on behalf of different account")
     chat = get_by_id(session, chat_id)
 
     account = session.get(DBAccount, message.account_id)
