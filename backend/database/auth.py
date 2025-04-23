@@ -10,14 +10,15 @@ from backend.models.auth import AccessToken, Claims, Login, Registration
 from backend.exceptions import DuplicateEntityValue, EntityNotFound, Forbidden, InvalidCredentials
 from backend.utils import _hash_password, _verify_password  
 from backend.database.schema import DBAccount
+from backend.config import settings
 
 
 load_dotenv()
-JWT_SECRET_KEY = os.getenv("jwt_secret_key")
-JWT_COOKIE_KEY = os.getenv("jwt_cookie_key")
-JWT_ALGORITHM = os.getenv("jwt_algorithm")
-JWT_ISSUER = os.getenv("jwt_issuer")
-DURATION = os.getenv("jwt_duration", 3600)  # Default to 1 hour if not set
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+JWT_COOKIE_KEY = os.getenv("JWT_COOKIE_KEY")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_ISSUER = os.getenv("JWT_ISSUER")
+DURATION = os.getenv("JWT_DURATION", 3600)  # Default to 1 hour if not set
 
 
 def create_user(session: Session, form: Registration) -> DBAccount:
@@ -70,7 +71,7 @@ def generate_token(session: Session, form: Login) -> str:
     
 def generate_claims(account: DBAccount) -> Claims:
     iat = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
-    exp = iat + DURATION
+    exp = iat + int(DURATION)
     return Claims(
         sub=str(account.id),
         iss=JWT_ISSUER,
