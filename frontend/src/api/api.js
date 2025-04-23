@@ -52,6 +52,30 @@ class ApiError extends Error {
     });
     return await handleResponse(response);
   };
+
+  const putForm = async (url, headers, data) => {
+    const response = await fetch(baseUrl + url, {
+      headers: {
+        ...headers,
+        ...getAuthHeaders(),
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      method: "PUT",
+      body: new URLSearchParams(data),
+    });
+    return await handleResponse(response);
+  };
   
-  export default { get, post, form };
+  const _delete = async (url, headers) => {
+    const response = await fetch(baseUrl + url, {
+      headers: {
+        ...headers,
+        ...getAuthHeaders(),
+      },
+      method: "DELETE",
+    });
+    return await handleResponse(response);
+  }
+
+  export default { get, post, form, putForm, _delete };
   

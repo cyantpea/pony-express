@@ -8,6 +8,9 @@ import FormButton from "../components/FormButton.jsx";
 import { useAuth } from "../hooks";
 import api from "../api/api";
 
+const headerClassName = "text-center text-4xl font-extrabold py-4";
+
+
 function Error({ message }) {
   return <p className="text-amber-800 text-sm">{message}</p>;
 }
@@ -34,7 +37,7 @@ export default function Login() {
   });
 
   if (loggedIn) {
-    return <Navigate to="/" />;
+    return <Navigate to="/chats" />;
   }
 
   const handleSubmit = (e) => {
@@ -45,25 +48,34 @@ export default function Login() {
   const buttonDisabled = !username || !password || disabled;
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <FormInput
-        id="username"
-        type="text"
-        name="username"
-        text="username"
-        value={username}
-        setValue={setUsername}
-      />
-      <FormInput
-        id="password"
-        type="password"
-        name="password"
-        text="password"
-        value={password}
-        setValue={setPassword}
-      />
-      {errorMsg && <Error message={errorMsg} />}
-      <FormButton text="login" disabled={buttonDisabled} />
-    </Form>
+    <div>
+      <h1 className={headerClassName}>Pony Express</h1>
+      <Form onSubmit={handleSubmit}>
+        <FormInput
+          id="username"
+          type="text"
+          name="username"
+          text="username"
+          value={username}
+          setValue={setUsername}
+        />
+        <FormInput
+          id="password"
+          type="password"
+          name="password"
+          text="password"
+          value={password}
+          setValue={setPassword}
+        />
+        {errorMsg && <Error message={errorMsg} />}
+        <FormButton text="login" disabled={buttonDisabled} />
+      </Form>
+      <p className="text-center text-sm">
+        <a href="/register" className="text-blue-500 hover:underline">
+          register new account
+        </a>
+      </p>
+    </div>
+      
   );
 }

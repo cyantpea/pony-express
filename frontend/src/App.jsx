@@ -6,6 +6,9 @@ import AuthProvider from "./providers/AuthProvider";
 import Login from "./accounts/Login"
 import { useContext } from "react";
 import { AuthContext } from "./contexts";
+import { useEffect, useState } from "react";
+import Register from "./accounts/Registration"
+import Settings from "./accounts/Settings"
 //import Nav from "./components/Nav"
 
 const headerClassName = "text-center text-4xl font-extrabold py-4";
@@ -23,33 +26,19 @@ function NotFound() {
 
 function Home() {
   const { loggedIn } = useContext(AuthContext);
-  const [redirect, setRedirect] = useState(false);
 
-  useEffect(() => {
-    if (loggedIn) {
-      setRedirect(true);
-    }
-  }, [loggedIn]);
-
-  if (redirect) {
+  if (loggedIn) {
     return <Navigate to="/chats" replace />;
   }
 
   return (
     <div>
-      <h1 className={headerClassName}>Pony Express</h1>
       <Login />
     </div>
   );
 }
 
-function Register() {
-  return <h1 className={headerClassName}>Pony Express</h1>;
-}
 
-function Settings() {
-  return <h1 className={headerClassName}>Pony Express</h1>;
-}
 
 function Chats() {
   return (
@@ -144,7 +133,7 @@ function Nav() {
         <ul>
           <li className={navHeaders}>Account</li>
           <li className={navItems}><NavLink className={getClassName} to="/settings">Settings</NavLink></li>
-          <li className={navItems}><Button /></li>
+          <li className={navItems}><LogoutButton /></li>
           <li className={navHeaders}>Chats</li>
           {chats.map((chat) => (
             <ChatItem key={chat.id} getClassName={getClassName} {...chat}/>
@@ -154,12 +143,12 @@ function Nav() {
     );
 }
 
-function Button() {
+function LogoutButton() {
     const getClassName = "hover:bg-blue-200 rounded px-2 py-1 hover:text-gray-700 text-gray-200 bg-blue-700";
     const { logout } = useContext(AuthContext);
     
     return (
-        <Link to="/">
+        <Link to="/login">
             <button onClick={logout} type="button" className={getClassName}>Logout</button>
         </Link>
     );

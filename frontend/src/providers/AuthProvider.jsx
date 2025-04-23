@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { AuthContext } from "../contexts";
 
-const tokenKey = "recipes_access_token";
+const tokenKey = "pony_express_token";
 
 export default function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(tokenKey));
