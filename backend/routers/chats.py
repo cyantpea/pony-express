@@ -76,6 +76,7 @@ def post_chat_messages(session: DBSession, chat_id: int, message: model_chats.Me
         "text": new_message.text,
         "chat_id": new_message.chat_id,
         "created_at": new_message.created_at,
+        "account_id": account.id
     }
 
 @chats_router.put("/{chat_id}/messages/{message_id}", status_code=200)
@@ -87,6 +88,7 @@ def add_message(session: DBSession, chat_id: int, message_id: int, message: mode
         "text": updated_message.text,
         "chat_id": updated_message.chat_id,
         "created_at": updated_message.created_at,
+        "account_id": updated_message.id
     }
 
 @chats_router.delete("/{chat_id}/messages/{message_id}", status_code=204)

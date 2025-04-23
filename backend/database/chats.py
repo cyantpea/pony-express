@@ -327,13 +327,12 @@ def delete_membership(session: Session, chat_id: int, account_id: int):
         
     Raises:
         EntityNotFound: If no chat with given id exists
-        EntityNotFound: If no account with given id exists
         ChatMembershipRequired: If the account is not a member of the chat
         ChatOwnerRemoval: If trying to remove the owner of the chat
     """
 
     chat = get_by_id(session, chat_id)
-    account = db_accounts.get_by_id(session, account_id)
+    account = session.get(DBAccount, account_id)
     membership = get_membership_by_ids(session, chat_id, account_id)
 
     if not membership or not account:
