@@ -17,7 +17,7 @@ load_dotenv()
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_COOKIE_KEY = os.getenv("JWT_COOKIE_KEY")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-JWT_ISSUER = os.getenv("JWT_ISSUER")
+JWT_ISSUER = os.getenv("JWT_ISSUER", "pony-express")
 DURATION = os.getenv("JWT_DURATION", 3600)  # Default to 1 hour if not set
 
 
