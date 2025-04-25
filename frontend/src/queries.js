@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "./api/api";
+import { useContext } from "react";
+import { AuthContext } from "./contexts";
 
 
 export const useChats = () => {
@@ -27,6 +29,17 @@ export const useChatMessages = (chatId) => {
     return { messages, error };
 }
 
+export const useChatMembers = (chatId) => {
+    const { data, error } = useQuery({
+        queryKey: ["accounts", chatId],
+        queryFn: () => api.get(`/chats/${chatId}/accounts`),
+        retry: false,
+    });
+
+    const members = (data?.accounts || [])
+    return { members, error };
+}
+
 export const useUsername = (accountId) => {
     if (accountId == null) 
         return { username: "[removed]", error: null };
@@ -42,21 +55,13 @@ export const useUsername = (accountId) => {
 }
 
 export const useAccount = () => {
-    const { headers, loggedIn, logout } = useContext(AuthContext);
-    const query = useQuery({
-        enabled: loggedIn,
-        queryKey: ["account"],
-        queryFn: async () => {
-            const response = await fetch("/accounts/me", { headers });
-            const data = await response.json();
-            if (response.ok) {
-                return data;
-            }
-            if (data.error === "expired_access_token") {
-                logout();
-            }
-            throw new ApiError(response.status, data);
-        }
-    });
-    return query.data || { id: -1, username: "", email: "" };
+  const { headers, loggedIn, token } = useContext(AuthContext);
+  const query = useQuery({
+    enabled: loggedIn,
+    queryKey: ["account"],
+    queryFn: async () => {
+      return await api.get("/accounts/me", { Authorization: `Bearer ${token}`, ...headers });
+    }
+  });
+  return query;
 }

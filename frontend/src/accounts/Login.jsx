@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Form from "../components/Form";
 import FormInput from "../components/FormInput";
 import FormButton from "../components/FormButton.jsx";
-import { useAuth } from "../hooks";
+import { AuthContext } from "../contexts"
 import api from "../api/api";
 
 const headerClassName = "text-center text-4xl font-extrabold py-4";
@@ -20,11 +20,12 @@ Error.propTypes = {
 };
 
 export default function Login() {
-  const { loggedIn, login } = useAuth();
+  const { loggedIn, login } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [disabled, setDisabled] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: () => api.form("/auth/token", {}, { username, password }),
@@ -36,9 +37,11 @@ export default function Login() {
     },
   });
 
-  if (loggedIn) {
-    return <Navigate to="/chats" />;
-  }
+  useEffect(() => {
+      if (loggedIn) {
+        navigate("/chats");
+      }
+    }, [loggedIn, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

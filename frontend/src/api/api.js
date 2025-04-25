@@ -10,6 +10,7 @@ class ApiError extends Error {
   }
   
   const baseUrl = "http://localhost:8000";
+
   
   const handleResponse = async (response) => {
     if (response.ok) {
@@ -28,7 +29,16 @@ class ApiError extends Error {
   };
   
   const get = async (url, headers) => {
-    const response = await fetch(baseUrl + url, { headers });
+    const response = await fetch(baseUrl + url, { headers: headers, });
+    return await handleResponse(response);
+  };
+
+  const put = async (url, headers, data) => {
+    const response = await fetch(baseUrl + url, {
+      headers,
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
     return await handleResponse(response);
   };
   
@@ -57,7 +67,6 @@ class ApiError extends Error {
     const response = await fetch(baseUrl + url, {
       headers: {
         ...headers,
-        ...getAuthHeaders(),
         "Content-Type": "application/x-www-form-urlencoded",
       },
       method: "PUT",
@@ -70,12 +79,11 @@ class ApiError extends Error {
     const response = await fetch(baseUrl + url, {
       headers: {
         ...headers,
-        ...getAuthHeaders(),
       },
       method: "DELETE",
     });
     return await handleResponse(response);
   }
 
-  export default { get, post, form, putForm, _delete };
+  export default { get, put, post, form, _delete, putForm };
   

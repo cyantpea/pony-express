@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, NavLink, useParams, Link } from "react-router";
+import { BrowserRouter, Routes, Route, NavLink, useParams, Link, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { useChatMessages, useChats, useUsername } from "./queries";
@@ -6,10 +6,12 @@ import AuthProvider from "./providers/AuthProvider";
 import Login from "./accounts/Login"
 import { useContext } from "react";
 import { AuthContext } from "./contexts";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Register from "./accounts/Registration"
-import Settings from "./accounts/Settings"
-//import Nav from "./components/Nav"
+import NewMessage from "./components/NewMessage";
+import SettingsComponent from "./accounts/SettingsComponent"
+import { useLoggedOut } from "./hooks";
+import { useAccount } from "./queries";
 
 const headerClassName = "text-center text-4xl font-extrabold py-4";
 
@@ -26,10 +28,13 @@ function NotFound() {
 
 function Home() {
   const { loggedIn } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  if (loggedIn) {
-    return <Navigate to="/chats" replace />;
-  }
+  useEffect(() => {
+    if (loggedIn) {
+      navigate("/chats");
+    }
+  }, [loggedIn, navigate]);
 
   return (
     <div>
@@ -38,9 +43,22 @@ function Home() {
   );
 }
 
-
+function Settings() {
+  useLoggedOut();
+  return (
+    <div className="flex">
+      <div className="w-1/4">
+        <Nav />
+      </div>
+      <div className="w-3/4 p-4">
+        <SettingsComponent />
+      </div>
+    </div>
+  )
+}
 
 function Chats() {
+  useLoggedOut();
   return (
     <div className="w-1/4">
       <Nav />
@@ -50,6 +68,7 @@ function Chats() {
 
 function Chat() {
   const {chatId} = useParams();
+  useLoggedOut();
   return (
     <div className="flex">
       <div className="w-1/4">
@@ -83,13 +102,39 @@ ChatItem.propTypes = {
 
 function Messages({chatId}) {
   const { messages } = useChatMessages(chatId);
+  const [scrollValue, setScrollValue] = useState(0);
+  const listRef = useRef(null);
+
+  useEffect(() => {
+      // update scrollValue anytime listRef.current is scrolled
+      listRef.current.addEventListener("scroll", () => {
+        setScrollValue(Math.round(listRef.current.scrollTop));
+      });
+    }, []);
+
+  const scrollToBottom = () => {
+    listRef.current.scrollTo({
+      top: listRef.current.scrollHeight,
+      left: 0,
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    if (listRef.current) {
+      scrollToBottom();
+    }
+  }, [messages]);
 
   return (
-    <ul className="max-h-150 overflow-y-scroll">
+    <div className="flex flex-row justify-between">
+    <ul ref={listRef} className="h-[calc(100lvh-256px)] max-h-160 min-h-full overflow-y-scroll">
       {messages.map((message) => (
         <Message key={message.id} text={message.text} account_id={message.account_id} created_at={message.created_at}/>
       ))}
     </ul>
+    <NewMessage chatId={chatId} />
+    </div>
   );
 }
 
@@ -122,6 +167,15 @@ Message.propTypes = {
 
 function Nav() {
     const { chats } = useChats();
+      const [username, setUsername] = useState("");
+      const { data: fetchedAccount, isSuccess } = useAccount();
+    
+      useEffect(() => {
+        if (isSuccess && fetchedAccount) {
+          setUsername(fetchedAccount.username);
+        }
+      }, [isSuccess, fetchedAccount]);
+    
     const getClassName = ({isActive}) =>
       isActive ? "text-orange-600" : "text-blue-500 hover:text-blue-200"
   
@@ -131,7 +185,7 @@ function Nav() {
             Pony Express
           </h1>
         <ul>
-          <li className={navHeaders}>Account</li>
+          <li className={navHeaders}>{username}</li>
           <li className={navItems}><NavLink className={getClassName} to="/settings">Settings</NavLink></li>
           <li className={navItems}><LogoutButton /></li>
           <li className={navHeaders}>Chats</li>
