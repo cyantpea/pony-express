@@ -61,6 +61,9 @@ def generate_token(session: Session, form: Login) -> str:
     account = session.exec(select(DBAccount).where(DBAccount.username == form.username)).first()
     
     account = validate_credentials(account, form.password)
+    if account is None:
+        raise InvalidCredentials()
+
     claims = generate_claims(account)
 
     return jwt.encode(

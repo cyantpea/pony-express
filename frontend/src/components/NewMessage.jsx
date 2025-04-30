@@ -9,34 +9,44 @@ import { AuthContext } from "../contexts"
 import api from "../api/api";
 import { useChatMembers, useAccount } from "../queries";
 
+function Error({ message }) {
+  return <p className="text-amber-800 text-sm">{message}</p>;
+}
+
+Error.propTypes = {
+  message: PropTypes.string,
+};
+
 export default function NewMessage({chatId}) {
-  const [accountId, setAccountId] = useState(-1);
+  const { headers, token } = useContext(AuthContext);
   const { data: fetchedAccount, isSuccess } = useAccount();
   const { members, error: memberError } = useChatMembers(chatId);
   const [disabled, setDisabled] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [isMember, setIsMember] = useState(false);
+  const [accountId, setAccountId] = useState(null);
+    const [errorMsg, setErrorMsg] = useState("");
 
   
   useEffect(() => {
     if (isSuccess && fetchedAccount) {
-      setAccountId({
-        id: fetchedAccount.id
-      });
-    }
-    if (isSuccess && fetchedAccount && members) {
-      setIsMember(members.some((member) => member.id === fetchedAccount.id));
+      setAccountId(fetchedAccount.id);
+    
+      if (members) {
+        setIsMember(members.some((member) => member.id === fetchedAccount.id));
+      }
     }
 
   }, [isSuccess, fetchedAccount, members]);
 
 
   const mutation = useMutation({
-      mutationFn: () => api.post(`/chats/${chatId}/messages`, {
-        Authorization: `Bearer ${token}`,
-        ...headers,
-      }, { messageText }),
-      onMutate: () => setDisabled(true),
+      mutationFn: ({messageText, accountId}) => 
+        api.post(`/chats/${chatId}/messages`, {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            ...headers,
+        }, { text: messageText, account_id: accountId }),
       onSuccess: () => setMessageText(""),
       onError: (error) => {
         setDisabled(false);
@@ -46,14 +56,15 @@ export default function NewMessage({chatId}) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate();
+    mutation.mutate({messageText, accountId});
   }
 
     const sendDisabled = !messageText || disabled;
 
   if (isMember) {
     return (
-        <Form onSubmit={handleSubmit}>
+        <form className="flex flex-row" onSubmit={handleSubmit}>
+            {errorMsg && <Error message={errorMsg} />}
             <FormInput
                 id="message"
                 type="text"
@@ -62,12 +73,13 @@ export default function NewMessage({chatId}) {
                 value={messageText}
                 setValue={setMessageText}
             />
+
             <FormButton
                 text="Send"
                 disabled={sendDisabled}
                 
             />
-        </Form>
+        </form>
     )
     }
 

@@ -127,7 +127,7 @@ function Messages({chatId}) {
   }, [messages]);
 
   return (
-    <div className="flex flex-row justify-between">
+    <div className="flex flex-col justify-between">
     <ul ref={listRef} className="h-[calc(100lvh-256px)] max-h-160 min-h-full overflow-y-scroll">
       {messages.map((message) => (
         <Message key={message.id} text={message.text} account_id={message.account_id} created_at={message.created_at}/>

@@ -21,12 +21,15 @@ export const useAccount = () => {
 }
 
 export const useLoggedOut = () => {
-  const { loggedIn } = useContext(AuthContext);
+  const { loggedIn, authLoaded } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  console.log("logged out:", !loggedIn);
+  console.log("auth loaded:", authLoaded);
   useEffect(() => {
-    if (!loggedIn) {
+    console.log("useLoggedOut effect", !loggedIn && authLoaded);
+    if (!loggedIn && authLoaded) {
+      console.log("redirecting");
       navigate("/");
     }
-  }, [loggedIn, navigate]);
+  }, [loggedIn, authLoaded, navigate]);
 };
