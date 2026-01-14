@@ -16,8 +16,8 @@ from backend.config import settings
 load_dotenv()
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_COOKIE_KEY = os.getenv("JWT_COOKIE_KEY")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-JWT_ISSUER = os.getenv("JWT_ISSUER", "http://127.0.0.1")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+JWT_ISSUER = os.getenv("JWT_ISSUER")
 DURATION = os.getenv("JWT_DURATION", 3600)  # Default to 1 hour if not set
 
 

@@ -8,8 +8,7 @@ class ApiError extends Error {
       this.code = error;
     }
   }
-  
-  const baseUrl = "http://localhost:8000";
+  const baseUrl = os.getenv("API_URL") 
 
   
   const handleResponse = async (response) => {

@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts";
 import { useEffect } from "react";
 
 
-const tokenKey = "pony_express_token";
+const tokenKey = process.env.JWT_COOKIE_KEY;
 
 export default function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(tokenKey));

@@ -41,16 +41,19 @@ export const useChatMembers = (chatId) => {
 }
 
 export const useUsername = (accountId) => {
+    console.log("useUsername", accountId);
     if (accountId == null) 
         return { username: "[removed]", error: null };
 
     const { data, error } = useQuery({
-        queryKey: ["username"],
+        queryKey: ["username", accountId],
         queryFn: () => api.get("/accounts/" + accountId),
         retry: false,
     });
+    console.log("useUsername data", data);
 
     const username = data?.username || "[removed]";
+    console.log("username", username);
     return { username, error };
 }
 
